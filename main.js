@@ -17,7 +17,7 @@ closeCart.addEventListener("click", () => {
   cart.classList.remove("active");
 });
 
-function addCart() {
+function addProduct() {
   addCartIcons.forEach((addCartIcon) => {
     addCartIcon.addEventListener("click", (e) => {
       const productBox = e.target.parentNode;
@@ -36,13 +36,38 @@ function addCart() {
         <img src="${data.imgSrc}" alt="" class="cart-img" />
         <div class="detail-box">
           <div class="cart-product-title">${data.title}</div>
-          <div class="cart-price">${data.price}</div>
-          <input type="number" class="cart-quantity" />
+          <div class="cart-price" data-base-price="${parseInt(data.price.substring(1))}">${data.price}</div>
+          <input type="number" class="cart-quantity" value="1" min="1" />
         </div>
         <i class="bx bxs-trash-alt cart-remove"></i>
       </div>`;
 
       cartContent.insertAdjacentHTML("afterbegin", template);
+      updatePriceTotal();
+      deleteProduct();
+      changeCartQuantity();
+    });
+  });
+}
+
+function deleteProduct() {
+  const cartRemove = document.querySelector(".cart-remove");
+  cartRemove.addEventListener("click", (e) => {
+    e.target.parentElement.innerHTML = "";
+    updatePriceTotal();
+  });
+}
+
+function changeCartQuantity() {
+  const cartQuantityInputs = document.querySelectorAll(".cart-quantity");
+  cartQuantityInputs.forEach((input) => {
+    input.addEventListener("change", (e) => {
+      const productBox = e.target.parentNode;
+      const priceDiv = productBox.querySelector(".cart-price");
+      const basePrice = parseInt(priceDiv.getAttribute("data-base-price"));
+      console.log(basePrice);
+      const updateCartPrice = e.target.value * basePrice;
+      priceDiv.innerHTML = `$${updateCartPrice}`;
       updatePriceTotal();
     });
   });
@@ -53,12 +78,11 @@ function updatePriceTotal() {
 
   let total = 0;
   cartPrice.forEach((box) => {
-    const dolar = box.innerHTML;
-    const priceNumber = parseInt(dolar.substring(1));
+    const priceDiv = box.innerHTML;
+    const priceNumber = parseInt(priceDiv.substring(1));
     total += priceNumber;
   });
-  console.log(total);
   totalPrice.innerHTML = total;
 }
 
-addCart();
+addProduct();
